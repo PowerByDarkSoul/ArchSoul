@@ -1,0 +1,32 @@
+[font]
+size = 16
+
+[font.bold]
+family = "JetBrainsMono Nerd Font"
+style = "Bold"
+
+[font.bold_italic]
+family = "JetBrainsMono Nerd Font"
+style = "Bold Italic"
+
+[font.italic]
+family = "JetBrainsMono Nerd Font"
+style = "Italic"
+
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+style = "Medium"
+
+[cursor]
+style.shape = "Beam"
+
+[keyboard]
+bindings = [
+    # web search 'ANSI Escape Sequences' and 'List of Unicode characters' 
+    # \u**** is unicode value
+    # \u001b[ is a CSI (control sequence introducer)
+    # 5 is the sum of bits for the ctrl and shift modifiers (1 is shift, 2 is alt, 4 is ctrl)
+    # u stands for unicode
+    { key = "-", mods = "Control", chars = "\u001B[\u005F;5u" },
+    { key = "+", mods = "Control", chars = "\u001B[\u002B;5u" }
+]

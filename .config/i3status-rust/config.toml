@@ -1,0 +1,61 @@
+# see https://man.archlinux.org/man/extra/i3status-rust/i3status-rs.1.en
+# state properties: warning critical good info idle
+
+[theme]
+theme = "slick"
+[theme.overrides]
+idle_bg = "#333333"
+idle_fg = "#ffffff"
+
+[[block]]
+block = "custom"
+# command = "[[ $(fcitx5-remote) -eq 2 ]] && echo '  zh ' || echo '  en '"
+command = "[[ $(fcitx-remote) -eq 2 ]] && echo '  zh ' || echo '  en '"
+interval = 1
+
+[[block]]
+# WH-1000XM3
+block = "bluetooth"
+mac = "CC:98:8B:94:AA:8A"
+format = "  "
+disconnected_format = ""
+[block.battery_state]
+"0..100" = "idle"
+
+[[block]]
+# DualSense
+block = "bluetooth"
+mac = "10:18:49:43:7E:61"
+format = " 󰖺 "
+disconnected_format = ""
+[block.battery_state]
+"0..100" = "idle"
+
+[[block]]
+block = "sound"
+driver = "auto"
+format = " $icon  $output_name{ $volume|} "
+[block.mappings]
+"alsa_output.pci-0000_28_00.1.hdmi-stereo-extra4" = "Monitor"
+"bluez_sink.CC_98_8B_94_AA_8A.a2dp_sink" = "WH1000-XM3"
+[block.theme_overrides]
+good_fg = { link = "warning_fg" }
+good_bg = { link = "warning_bg" }
+warning_fg = "#000000"
+warning_bg = "#ffffff"
+[block.icons_overrides]
+microphone_muted = "\uf131"
+microphone = "\uf130"
+volume_muted = "\ueee8"
+volume = "\uf028"
+headphones = "\uee58"
+[[block.click]]
+button = "left"
+action = "toggle_mute"
+
+[[block]]
+block = "time"
+interval = 5
+format = " $timestamp.datetime(f:'%F %H:%M:%S') $icon "
+[block.icons_overrides]
+time = "\uf303"

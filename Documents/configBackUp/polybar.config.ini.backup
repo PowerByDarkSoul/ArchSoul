@@ -1,0 +1,146 @@
+# To learn more about how to configure Polybar
+# go to https://github.com/polybar/polybar
+# The README contains a lot of information
+
+[colors]
+background = #282A2E
+background-alt = #373B41
+foreground = #C5C8C6
+primary = #777777
+secondary = #8ABEB7
+alert = #A54242
+disabled = #707880
+
+[bar/example]
+# 使bar显示在下方
+bottom = true
+width = 100%
+height = 27pt
+radius = 6
+
+; dpi = 120
+
+background = ${colors.background}
+foreground = ${colors.foreground}
+
+line-size = 3pt
+
+border-size = 0pt
+border-color = #00000000
+
+padding-left = 0
+padding-right = 0
+
+module-margin = 1
+
+separator = |
+separator-foreground = ${colors.disabled}
+
+font-0 = NotoSansMono:style=Regular:size=14;2
+
+modules-left = menu-apps
+modules-center = xworkspaces
+modules-right = fcitx pulseaudio date
+
+cursor-click = pointer
+cursor-scroll = ns-resize
+
+enable-ipc = true
+
+; tray-position = right
+
+; wm-restack = i3
+
+; override-redirect = true
+
+# https://github.com/polybar/polybar/wiki/Module:-menu
+[module/menu-apps]
+type = custom/menu
+
+# true时label-open和label-close在左侧,false在右侧
+expand-right = true
+
+menu-0-0 = Firefox
+menu-0-0-exec = firefox
+
+menu-0-1 = Steam
+menu-0-1-exec = steam
+
+menu-0-2 = Warpinator
+menu-0-2-exec = warpinator
+
+menu-0-3 = Vlc
+menu-0-3-exec = vlc
+
+menu-0-4 = Power
+menu-0-4-exec = #menu-apps.open.1
+
+menu-1-0 = Back
+menu-1-0-exec = #menu-apps.open.0
+
+menu-1-1 = Shutdown
+menu-1-1-exec = shutdown now
+
+menu-1-2 = Reboot
+menu-1-2-exec = shutdown -r now
+
+menu-1-3 = Suspend
+menu-1-3-exec = systemctl suspend
+
+label-open = AppMenu
+label-close = X
+
+label-separator = " " 
+
+[module/xworkspaces]
+type = internal/xworkspaces
+
+label-active = %name%
+label-active-background = ${colors.background-alt}
+label-active-underline= ${colors.primary}
+label-active-padding = 1
+
+label-occupied = %name%
+label-occupied-padding = 1
+
+label-urgent = %name%
+label-urgent-background = ${colors.alert}
+label-urgent-padding = 1
+
+label-empty = %name%
+label-empty-foreground = ${colors.disabled}
+label-empty-padding = 1
+
+[module/fcitx]
+type = custom/script
+#format-prefix = " "
+exec = [[ $(fcitx5-remote) -eq 2 ]] && echo "zh" || echo "en"
+interval = 1
+format-prefix-foreground = ${colors.primary}
+
+[module/pulseaudio]
+type = internal/pulseaudio
+
+format-volume-prefix = "VOL "
+format-volume-prefix-foreground = ${colors.primary}
+format-volume = <label-volume>
+
+label-volume = %percentage%%
+
+label-muted = muted
+label-muted-foreground = ${colors.disabled}
+
+[module/date]
+type = internal/date
+interval = 1
+
+date = %Y-%m-%d %H:%M:%S
+
+label = %date%
+#label-foreground = ${colors.primary}
+
+[settings]
+screenchange-reload = true
+pseudo-transparency = true
+
+; vim:ft=dosini

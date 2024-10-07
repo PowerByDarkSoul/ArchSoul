@@ -1,24 +1,16 @@
 [font]
 size = 16
+normal={ family = "JetBrainsMono Nerd Font", style = "Medium" }
+bold = { family = "JetBrainsMono Nerd Font", style = "Bold" }
+italic = { family = "JetBrainsMono Nerd Font", style = "Italic" }
+bold_italic = { family = "JetBrainsMono Nerd Font", style = "Bold Italic" }
 
-[font.bold]
-family = "JetBrainsMono Nerd Font"
-style = "Bold"
-
-[font.bold_italic]
-family = "JetBrainsMono Nerd Font"
-style = "Bold Italic"
-
-[font.italic]
-family = "JetBrainsMono Nerd Font"
-style = "Italic"
-
-[font.normal]
-family = "JetBrainsMono Nerd Font"
-style = "Medium"
-
-[cursor]
-style.shape = "Beam"
+# when neovim cursor style different from alacritty
+# quit neovim cursor stay neovim setting
+# alacritty author say this is to be expected
+# [cursor]
+# style = { shape = "Beam", blinking = "Never" }
+# vi_mode_style = { shape = "Block", blinking = "Never" }
 
 [keyboard]
 bindings = [

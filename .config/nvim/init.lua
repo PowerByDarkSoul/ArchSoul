@@ -53,11 +53,8 @@ opt.history = 100
 --auto-complete
 opt.completeopt = { "menuone", "preview", "noinsert", "noselect" }
 opt.pumheight = 10
---折叠代码使用
-opt.foldlevel = 99
+--fold
 opt.foldlevelstart = 99
-opt.foldmethod = "expr"
-opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 
 ---------------
 --- keymaps ---
@@ -138,8 +135,14 @@ api.nvim_create_autocmd("LspAttach", {
     desc = "lsp attach",
     group = lspGroup,
     callback = function(args)
-        vim.bo[args.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
-        -- vim.bo[args.buf].formatexpr = "v:lua.vim.lsp.buf.format()"
+        local bufnr = args.buf
+        local client = vim.lsp.get_client_by_id(args.data.client_id)
+        if client.server_capabilities.completionProvider then
+            vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
+        end
+        if client.server_capabilities.definitionProvider then
+            vim.bo[bufnr].tagfunc = "v:lua.vim.lsp.tagfunc"
+        end
         map.set({ "n", "v" }, "<C-A-l>", lsp.buf.format)
         map.set("i", "<C-A-l>", function()
             api.nvim_input("<Esc>")
@@ -172,12 +175,17 @@ api.nvim_create_autocmd("FileType", {
 ----------------
 -- treesitter --
 ----------------
---local treeSitterGroup = api.nvim_create_augroup("tree-sitter-group", { clear = true })
---vim.api.nvim_create_autocmd("FileType", {
---    desc = "lua tree-sitter",
---    group = treeSitterGroup,
---    pattern = "lua",
---    callback = function(args)
---        vim.treesitter.start(args.buf)
---    end
---})
+local treeSitterGroup = api.nvim_create_augroup("tree-sitter-group", { clear = true })
+vim.api.nvim_create_autocmd("FileType", {
+    desc = "lua tree-sitter",
+    group = treeSitterGroup,
+    pattern = "lua",
+    callback = function()
+        -- vim.treesitter.start(args.buf)
+        --折叠代码使用
+        local winid = api.nvim_get_current_win()
+        vim.wo[winid].foldlevel = 99
+        vim.wo[winid].foldmethod = "expr"
+        vim.wo[winid].foldexpr = "v:lua.vim.treesitter.foldexpr()"
+    end
+})

@@ -35,8 +35,8 @@ opt.autoindent = true
 --禁用鼠标
 opt.mouse = ""
 --status状态栏
-opt.laststatus = 1
-opt.statusline = "%t %r"
+opt.laststatus = 2
+opt.statusline = "#%n %t %M"
 --按键显示禁用
 opt.showcmd = false
 --脚标禁用

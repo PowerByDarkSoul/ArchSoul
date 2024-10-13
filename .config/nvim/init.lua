@@ -51,8 +51,9 @@ opt.splitbelow = true
 --历史记录
 opt.history = 100
 --auto-complete
-opt.completeopt = { "menuone", "preview", "noinsert", "noselect" }
-opt.pumheight = 10
+opt.completeopt = { "menu", "noinsert", "noselect" }
+opt.pumheight = 5
+-- opt.pumwidth = 25 -- not work?
 --fold
 opt.foldlevelstart = 99
 
@@ -69,25 +70,18 @@ map.set("n", "<C-j>", "<C-w>j")
 map.set("n", "<C-k>", "<C-w>k")
 map.set("n", "<C-h>", "<C-w>h")
 map.set("n", "<C-l>", "<C-w>l")
---折叠选中代码
-map.set("v", "<C-S-_>", ":fold<CR>")
 --移动整行
 map.set("v", "J", ":m '>+1<CR>gv=gv")
 map.set("v", "K", ":m '<-2<CR>gv=gv")
---自动补全
---map.set("i", "[", "[]<Left>")
---map.set("i", "{", "{}<Left>")
---map.set("i", "(", "()<Left>")
---map.set("i", "<", "<><Left>")
---map.set("i", "\"", "\"\"<Left>")
---复制粘帖
-map.set("v", "<C-c>", "y<Esc>")
-map.set("i", "<C-v>", "<Esc>pi<Right>")
 --使用黑洞寄存器 不复制删除的文字
 map.set({ "v", "n" }, "d", "\"_d")
 map.set({ "v", "n" }, "c", "\"_c")
---help文档跳转到光标指向的标记
-map.set("n", "hn", ":h <C-r><C-w><CR>")
+--omnifunc
+map.set("i", "<A-Enter>", "<C-x><C-o>")
+map.set("i", "<Tab>", function()
+    return vim.fn.pumvisible() == 1 and "<Down>" or "<Tab>"
+end, { expr = true })
+map.set("i", "<S-Tab>", "<Up>")
 
 ---------------
 ---- netrw ----
@@ -117,7 +111,7 @@ g.netrw_browse_split = 4
 --netrw auto size
 local netrwAutoSize = api.nvim_create_augroup("netrw_auto_size", { clear = true })
 api.nvim_create_autocmd("BufWinEnter", {
-    desc = "&ft是文件类型, vertical resize的参数不是百分比, 在2k分辨率下100%是200, 留下5的空缺疑似是sidebar",
+    desc = "&ft是文件类型, vertical resize的参数不是百分比",
     group = netrwAutoSize,
     command = "if &ft == 'netrw' | vertical resize 50 | else | vertical resize 145 | endif",
 })
@@ -136,7 +130,7 @@ api.nvim_create_autocmd("LspAttach", {
     group = lspGroup,
     callback = function(args)
         local bufnr = args.buf
-        local client = vim.lsp.get_client_by_id(args.data.client_id)
+        local client = lsp.get_client_by_id(args.data.client_id)
         if client.server_capabilities.completionProvider then
             vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
         end
@@ -148,6 +142,8 @@ api.nvim_create_autocmd("LspAttach", {
             api.nvim_input("<Esc>")
             lsp.buf.format()
         end)
+        -- 禁用注释行换行自动注释
+        opt.formatoptions:remove({ "c", "r", "o" })
     end,
 })
 api.nvim_create_autocmd("FileType", {
@@ -161,14 +157,43 @@ api.nvim_create_autocmd("FileType", {
             client_id = lsp.start({
                 name = "lua-ls",
                 cmd = { "lua-language-server" },
-                settings = { Lua = { diagnostics = { globals = { 'vim' } } } },
+                settings = { Lua = { diagnostics = { globals = { "vim" } } } },
             })
         else
             client_id = client.id
         end
         lsp.buf_is_attached(0, client_id)
-        -- 禁用注释行换行自动注释
-        opt.formatoptions:remove({ "c", "r", "o" })
+    end,
+})
+api.nvim_create_autocmd("FileType", {
+    desc = "rust lsp",
+    group = lspGroup,
+    pattern = "rust",
+    callback = function()
+        local client = lsp.get_clients({ name = "rust-ls" })[1]
+        local client_id
+        if client == nil then
+            client_id = lsp.start({
+                name = "rust-ls",
+                cmd = { "rustup", "run", "stable", "rust-analyzer" },
+                settings = {
+                    ["rust-analyzer"] = {
+                        diagnostics = {
+                            enable = false,
+                        },
+                        imports = {
+                            granularity = {
+                                group = "module",
+                            },
+                            prefix = "self",
+                        },
+                    }
+                }
+            })
+        else
+            client_id = client.id
+        end
+        lsp.buf_is_attached(0, client_id)
     end,
 })
 
@@ -176,12 +201,12 @@ api.nvim_create_autocmd("FileType", {
 -- treesitter --
 ----------------
 local treeSitterGroup = api.nvim_create_augroup("tree-sitter-group", { clear = true })
-vim.api.nvim_create_autocmd("FileType", {
-    desc = "lua tree-sitter",
+api.nvim_create_autocmd("FileType", {
+    desc = "tree-sitter",
     group = treeSitterGroup,
-    pattern = "lua",
+    pattern = { "lua" },
     callback = function()
-        -- vim.treesitter.start(args.buf)
+        pcall(vim.treesitter.start)
         --折叠代码使用
         local winid = api.nvim_get_current_win()
         vim.wo[winid].foldlevel = 99

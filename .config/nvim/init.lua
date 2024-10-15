@@ -76,50 +76,58 @@ map.set("v", "K", ":m '<-2<CR>gv=gv")
 --使用黑洞寄存器 不复制删除的文字
 map.set({ "v", "n" }, "d", "\"_d")
 map.set({ "v", "n" }, "c", "\"_c")
---omnifunc
-map.set("i", "<A-Enter>", "<C-x><C-o>")
+--completion
+map.set("i", "<A-Enter>", function()
+    if vim.bo.omnifunc == '' then
+        return "<C-x><C-n>"
+    else
+        return "<C-x><C-o>"
+    end
+end, { expr = true })
 map.set("i", "<Tab>", function()
     return vim.fn.pumvisible() == 1 and "<Down>" or "<Tab>"
 end, { expr = true })
-map.set("i", "<S-Tab>", "<Up>")
+map.set("i", "<S-Tab>", function()
+    return vim.fn.pumvisible() == 1 and "<Up>" or "<S-Tab>"
+end, { expr = true })
 
 ---------------
 ---- netrw ----
 ---------------
 --禁用netrw
---g.loaded_netrw = 1
---g.loaded_netrwPlugin = 1
---设置是否显示横幅
-g.netrw_banner = 0
---排序
-g.netrw_sort_by = "name"
-g.netrw_sort_direction = "normal"
---排序忽略大小写
-g.netrw_sort_options = "i"
---设置目录列表的样式 0,1,2,3
-g.netrw_liststyle = 3
---使用"rm -rf"执行D删除命令
-g.netrw_localrmdir = "rm -rf"
---格式化时间戳
-g.netrw_timefmt = "%Y-%m-%d %T"
---see :help g:netrw_preview
-g.netrw_preview = 1
-g.netrw_alto = 0
-g.netrw_altv = 1
---按下回车水平分割文件
-g.netrw_browse_split = 4
---netrw auto size
-local netrwAutoSize = api.nvim_create_augroup("netrw_auto_size", { clear = true })
-api.nvim_create_autocmd("BufWinEnter", {
-    desc = "&ft是文件类型, vertical resize的参数不是百分比",
-    group = netrwAutoSize,
-    command = "if &ft == 'netrw' | vertical resize 50 | else | vertical resize 145 | endif",
-})
-api.nvim_create_autocmd("FileType", {
-    group = netrwAutoSize,
-    pattern = "netrw",
-    command = "vertical resize 50 | set winfixwidth",
-})
+g.loaded_netrw = 1
+g.loaded_netrwPlugin = 1
+-- --设置是否显示横幅
+-- g.netrw_banner = 0
+-- --排序
+-- g.netrw_sort_by = "name"
+-- g.netrw_sort_direction = "normal"
+-- --排序忽略大小写
+-- g.netrw_sort_options = "i"
+-- --设置目录列表的样式 0,1,2,3
+-- g.netrw_liststyle = 3
+-- --使用"rm -rf"执行D删除命令
+-- g.netrw_localrmdir = "rm -rf"
+-- --格式化时间戳
+-- g.netrw_timefmt = "%Y-%m-%d %T"
+-- --see :help g:netrw_preview
+-- g.netrw_preview = 1
+-- g.netrw_alto = 0
+-- g.netrw_altv = 1
+-- --按下回车水平分割文件
+-- g.netrw_browse_split = 4
+-- --netrw auto size
+-- local netrwAutoSize = api.nvim_create_augroup("netrw_auto_size", { clear = true })
+-- api.nvim_create_autocmd("BufWinEnter", {
+--     desc = "&ft是文件类型, vertical resize的参数不是百分比",
+--     group = netrwAutoSize,
+--     command = "if &ft == 'netrw' | vertical resize 50 | else | vertical resize 145 | endif",
+-- })
+-- api.nvim_create_autocmd("FileType", {
+--     group = netrwAutoSize,
+--     pattern = "netrw",
+--     command = "vertical resize 50 | set winfixwidth",
+-- })
 
 ---------------
 ----- lsp -----
@@ -180,12 +188,6 @@ api.nvim_create_autocmd("FileType", {
                     ["rust-analyzer"] = {
                         diagnostics = {
                             enable = false,
-                        },
-                        imports = {
-                            granularity = {
-                                group = "module",
-                            },
-                            prefix = "self",
                         },
                     }
                 }

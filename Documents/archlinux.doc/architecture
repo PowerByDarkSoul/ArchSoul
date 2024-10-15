@@ -1,0 +1,104 @@
+# UEFI启动systemd-boot
+systemd-boot默认情况下需要镜像和vmlinuz-linux在EFI分区下
+/boot/loader/loader.conf    # systemd-boot配置
+/boot/loader/entries/arch.conf  # archlinux启动配置
+
+# GRUB失效
+mount /dev/sdax  /mnt #挂载root分区
+mount /dev/sdax /mnt/efi #挂载efi分区
+arch-chroot /mnt # 切换至系统
+grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB
+grub-mkconfig -o /boot/grub/grub.cfg
+
+# 自动登陆虚拟命令行
+1.sudo systemctl edit getty@tty1 --drop-in=autologin
+2.输入:
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty -o '-p -f -- \\u' --noclear --autologin <username> %I $TERM
+Type=simple
+
+# 改变系统日期格式
+编辑文件:/usr/share/i18n/locales/<system language and country code>
+修改d_fmt等LC_TIME下的时间戳格式
+%H: 小时(24小时制)
+%M: 分钟
+%S: 秒
+%T: 直接显示时间(24 小时制)
+%Y: 完整年份
+%m: 月份
+%d: 日
+
+# 命令行bash
+~/.bashrc       # 当前用户 非登录式SHELL: 图形终端打开命令窗口 自动执行的shell脚本
+~/.bash_profile # 当前用户 登陆式SHELL: 正常从终端登陆(tty)
+~/.bash_history # 历史记录
+
+# XDG
+~/.config/user-dirs.dirs    # 指定的用户目录
+~/.config/user-dirs.locale  # 根据使用的 locale 指定语言
+
+# Xorg
+~/.Xresources   # dpi缩放等
+~/.xinitrc      # xorg启动文件
+
+# 输入设备调整xorg-xinput 部分游戏需要它提供dualsense controller支持
+
+# wayland
+slurp 取屏幕一部分
+grim 截图
+wl-clipboard 全局剪切板
+
+# ssh
+命令ssh-keygen -A       # 生成HostKey
+~/.ssh/authorized_keys  # 用于存储client的publickey chmod 700 .ssh & chmod 600 authorized_keys
+/etc/ssh/sshd_config    # 编辑service配置文件
+    # 指定HostKey类型
+    HostKey /etc/ssh/ssh_host_****
+    # 禁止使用用户password安全验证
+    PasswordAuthentication no
+    # 指定publickey作为验证依据
+    AuthenticationMethods publickey
+
+# 翻墙
+v2ray
+v2rayA
+
+# 字体
+JetBrainsMono Nerd Font
+package-name: ttf-jetbrains-mono-nerd
+
+# 标准手册工具
+mandoc
+
+# swaywm
+swaybg # 背景壁纸
+~/.config/sway/config   # 配置文件
+
+# 输入法fcitx5
+~/.config/fcitx5        # 配置文件夹
+~/.local/share/fcitx5/themes    # 皮肤文件夹
+
+# 编辑器 文件管理器 neovim
+~/.config/nvim/init.lua     # 配置文件
+~/.viminfo                  # 历史记录
+~/.local/share/nvim/site    # package dir
+
+# 终端alacrity
+~/.config/alacritty/alacritty.yml   # 配置文件
+
+# neofetch
+~/.config/neofetch/config.conf  # 配置文件
+
+# 蓝牙bluez-utils
+
+# 解压工具p7zip
+
+# 视频播放器mpv
+~/.config/mpv/
+~/.config/vlc/vlcrc # 配置文件
+
+# 游戏模式gamemode
+
+# 游戏硬件监控mangohud
+~/.config/MangoHud/MangoHud.conf

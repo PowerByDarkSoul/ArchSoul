@@ -1,0 +1,163 @@
+# /etc/fstab参数
+nofail                              # 不抛出错误
+x-systemd.device-timeout=10s        # 超时时间10s
+
+# efibootmgr管理UEFI启动项
+efibootmgr              # 查看启动项列表
+efibootmgr -b <boot_number> -B      # 删除标号为boot_number的启动项
+efibootmgr -o <boot1>,<boot2>       # 指定boot1在boot2之前
+efibootmgr -a -b <boot_number>      # 启用标号为boot_number的启动项
+efibootmgr -A -b <boot_number>      # 禁用标号为boot_number的启动项
+
+# bash
+alt+backspace   # delete before cursor word
+alt+d           # delete after cursor text of the current word
+ctrl+u          # delete before cursor text to the beginning of the current line
+ctrl+k          # delete after cursor text to the end of the current line
+
+# 常用指令
+ls <path>               # 查看某个文件夹下的文件与子文件夹 /代表根目录，是Linux最顶端的路径，是绝对路径
+lsblk <dev/sdx>     # 'list block'输出指定分区信息
+    # -d, --nodeps: 不显示 slaves 或 holders
+    # -n, --noheadings: 不显示标题
+    # -o, --output <list>: 输出列
+pwd                 # 查看当前终端所在路径
+cd <path>               # 切换目录命令，将当前终端切换到某一个路径下
+cp <org_path> <target_path>     # 复制命令
+    # -r: 复制整体文件夹
+rm <file_path>              # 删除命令
+    # -f: 强制删除文件或目录
+    # -r/-R: 递归处理，将指定目录下的所有文件与子目录一并处理
+mv <org_path> <target_path>     # 移动(重命名)命令
+mkdir <new_folder>              # 新建文件夹new_folder
+du <path>               # 命令用于显示目录或文件的大小
+    # -s/--summarize: 仅显示指定目录或文件的总大小, 而不显示其子目录的大小
+    # -h/--human-readable: 以K, M, G为单位, 提高信息的可读性
+    # --exclude=<path/file>: 略过指定的目录或文件
+    # --max-depth=1: 显示子目录的层数
+sudo <command>                      # sudo指切换用户执行命令, 默认切换到root
+sudo dmidecode -t memory            # 查看内存信息
+sudo journalctl --vacuum-size=1M    # 清理日志使总大小小于1M
+sudo -e <file_path>                 # 正确的编辑系统文件方式, 先创建缓存文件, 编辑完成wq后才会生效
+ps aux | grep <program>             # 找出正在运行的program_name程序信息
+chmod [u|g|o|a]+x <file_path>       # 给予执行权限 u 代表用户 g 代表用户组 o 代表其他 a 代表所有
+chmod -x <file_path>                # 去除执行权限
+df -lhT                             # 打印出所有分区的列表
+mount -a                            # 加载文件/etc/fstab中设置的所有设备, 可刷新/etc/fstab配置
+
+# systemctl
+systemctl start <unit>              # 启动服务
+systemctl stop <unit>               # 停止服务
+systemctl restart <unit>            # 重启服务
+systemctl reload <unit>             # 重新加载服务以及它的配置文件
+systemctl status <unit>             # 查看服务状态
+systemctl enable <unit>             # 设置开机启动服务
+systemctl enable --now <unit>       # 设置服务为开机启动并立即启动这个单元:
+systemctl disable <unit>            # 取消开机自动启动
+systemctl daemon-reload <unit>      # 重新载入 systemd 配置 扫描新增或变更的服务单元 不会重新加载变更的配置 加载变更的配置用 reload
+systemctl edit <unit> --drop-in=<drop_in_name>  # 生成附加配置文件/etc/systemd/system/<unit>.service.d/<drop_in_name>.conf 省略--drop-in=选项默认文件名override.conf
+systemctl reboot                # 重启机器
+systemctl poweroff              # 关机
+systemctl suspend               # 挂起-睡眠-保存在內存
+systemctl hibernate             # 休眠-断电-保存在硬盘
+systemctl hybrid-sleep          # 混合休眠模式（同时休眠到硬盘并挂起）
+
+# 环境变量
+http_proxy          # 全局代理 export http_proxy="socks5:localhost:20170"
+
+# 调整输入设备 
+xinput list                                                 # 列出输入设备
+xinput list-props <设备id>                                  # 列出指定id设备属性
+xinput set-prop <设备id> <'属性名称'>|<属性编号> <属性值>   # 设置属性 鼠标速度属性名: libinput Accel Speed
+
+# 设置Xorg
+xset q                      # 查看当前设置
+xset s off                  # 禁用屏保清空
+xset s 3600 3600            # 将清空时间设置到 1 小时
+xset -dpms                  # 关闭 DPMS(显示电源管理信号)可以在计算机一定时间无操作时将显示器置于节电模式
+xset s off -dpms            # 禁用 DPMS 并阻止屏幕清空
+xset dpms force off         # 立即关闭屏幕
+xset dpms force standby     # 待机界面
+xset dpms force suspend     # 休眠界面
+
+# pacman常用指令
+pacman -S <package_name>        # 安装软件包
+pacman -Syu <package_name>      # 升级系统并安装软件包，Arch Linux 不支持部分升级，建议用此命令先升级再安装
+pacman -Syu                     # 升级系统
+pacman -Syyu                    # 升级系统 yy标记强制刷新 u标记升级动作
+pacman -R <package_name>        # 删除软件包
+pacman -Rs <package_name>       # 删除软件包，及其所有没有被其他已安装软件包使用的依赖包
+pacman -Qdt                     # 找出孤立包 Q为查询本地软件包数据库 d标记依赖包 t标记不需要的包 dt合并标记孤立包
+pacman -Rsn $(pacman -Qtdq)     # 删除孤立软件包 pacman 删除某些程序时会备份重要配置文件 在其后面加上*.pacsave扩展-n 选项可以避免备份这些文件
+pacman -Fy                      # 更新命令查询文件列表数据库
+pacman -F <command>             # 当不知道某个命令属于哪个包时 用来查询某个xxx命令属于哪个包
+pacman -U <xxx.pkg.tar.zst>     # 安装本地/网络包
+pacman -Scc                     # 要删除缓存中的全部文件 使用两次-c开关 这是最为激进的方式 将会清空缓存文件夹
+
+# vim
+#-------edit--------
+:!command                               # 执行shell命令 :!ls
+u                                       # 撤销
+crtl + r                                # 恢复前一次的操作
+ctrl + v                                # 选择块
+shift + v                               # 选择多行
+/<word>                                 # 搜索 按n键转到下一个
+?<word>                                 # 反向搜索
+:[range]s/<pattern>/<string>/[flags]    # substitute查找并替换
+p                                       # 将复制的数据再光标的下一行/下一个位置粘贴
+P                                       # 将复制的数据再光标的上一行/上一个位置粘贴
+gf                                      # 文件跳转 go to file, ctrl + o 回退, ctrl + i 前进
+:f                                      # 或者ctrl+g 打印文件path
+:ls/:buffers                            # 查看当前打开的buffer
+zo/zc                                   # 展开/收缩fold块, see :h fold 
+:%retab!                                # 按照expandtab格式重新设置当前文件TAB  !是用于处理非空白字符之后的TAB, 即所有的TAB
+$                                       # cursor move to end of the current line
+g_                                      # like $ but without the newline character at the end
+^                                       # cursor move to beginning of the current line
+0                                       # some as ^
+.                                       # repait last operation group
+q{0-9a-zA-Z"}                           # record macro to register, see :h q
+#-------netrw--------
+shift + d                               # 删除文件/文件夹
+shift + r                               # 重命名
+d                                       # 新建文件夹
+%                                       # 新建文件
+i                                       # 切换信息显示
+ctrl + w w                              # 切换到下一个窗口
+t                                       # 打开文件到新tab
+gt                                      # 顺序切换tab
+gT                                      # 倒序切换tab
+
+# fcitx
+ctrl + ;    # 剪贴板
+
+# aria2
+--bt-metadata-only=true                 # 仅下载种子文件
+-S <torrent_file_path>                  # 列出种子内容
+--select-file=1 <torrent_file_path>     # 下载指定编号的文件,比如1,3-5
+
+# 音量控制
+pactl list [short] sinks/sources                                        # 列出精简设备 去掉short输出完整信息
+pactl set-(sink|source)-volume <device_number|device_name> <volume>%    # 控制音量
+pactl set-(sink|source)-mute <device_number|device_name> toggle         # 切换静音/取消静音
+pactl get-default-(sink|source)                                         # 获取默认设备
+pactl set-default-(sink|source) <device_number|device_name>             # 设置默认设备
+
+# 7z解压
+x                   # 按照压缩文件目录解压文件
+-t<type>            # 指定压缩文件类型 zip 7z gzip bzip2 tar...
+
+# firefox
+ctrl + t                # 打开新标签页
+ctrl + w                # 关闭当前标签页
+ctrl + PageUp/PageDown  # 前一个/后一个标签页
+
+# steam启动选项
+https://wiki.archlinux.org/title/Steam#Launch_optiongs
+gamemoderun         # 启动游戏模式, 确保安装了gamemode, 位置在%command%之前
+mangohud            # 硬件信息显示, 确保安装了mangohud, 位置在%command%之前
+--skip-launcher     # 跳过启动器
+--vulkan            # 使用vulkan运行
+
+# sway criteria properties
+swaymsg -t get_tree # 查看窗口信息

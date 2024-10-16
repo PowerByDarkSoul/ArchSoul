@@ -55,12 +55,13 @@ systemctl enable <unit>             # 设置开机启动服务
 systemctl enable --now <unit>       # 设置服务为开机启动并立即启动这个单元:
 systemctl disable <unit>            # 取消开机自动启动
 systemctl daemon-reload <unit>      # 重新载入 systemd 配置 扫描新增或变更的服务单元 不会重新加载变更的配置 加载变更的配置用 reload
-systemctl edit <unit> --drop-in=<drop_in_name>  # 生成附加配置文件/etc/systemd/system/<unit>.service.d/<drop_in_name>.conf 省略--drop-in=选项默认文件名override.conf
-systemctl reboot                # 重启机器
-systemctl poweroff              # 关机
-systemctl suspend               # 挂起-睡眠-保存在內存
-systemctl hibernate             # 休眠-断电-保存在硬盘
-systemctl hybrid-sleep          # 混合休眠模式（同时休眠到硬盘并挂起）
+systemctl edit <unit>               # 生成附加配置文件/etc/systemd/system/<unit>.service.d/<drop_in_name>.conf 省略--drop-in=选项默认文件名override.conf
+    --drop-in=<drop_in_name>        # 配置文件名
+systemctl reboot                    # 重启机器
+systemctl poweroff                  # 关机
+systemctl suspend                   # 挂起-睡眠-保存在內存
+systemctl hibernate                 # 休眠-断电-保存在硬盘
+systemctl hybrid-sleep              # 混合休眠模式（同时休眠到硬盘并挂起）
 
 # 环境变量
 http_proxy          # 全局代理 export http_proxy="socks5:localhost:20170"
@@ -68,7 +69,7 @@ http_proxy          # 全局代理 export http_proxy="socks5:localhost:20170"
 # 调整输入设备 
 xinput list                                                 # 列出输入设备
 xinput list-props <设备id>                                  # 列出指定id设备属性
-xinput set-prop <设备id> <'属性名称'>|<属性编号> <属性值>   # 设置属性 鼠标速度属性名: libinput Accel Speed
+xinput set-prop <设备id> <属性名称>|<属性编号> <属性值>     # 设置属性 鼠标速度属性名: libinput Accel Speed
 
 # 设置Xorg
 xset q                      # 查看当前设置

@@ -91,8 +91,9 @@ map.set("i", "<S-Tab>", function()
     return vim.fn.pumvisible() == 1 and "<Up>" or "<S-Tab>"
 end, { expr = true })
 --terminal
-map.set("n", "<C-`>", "<cmd>split term://bash | set nonumber | set norelativenumber | resize 10<CR>")
+map.set("n", "<C-`>", "<cmd>split term://bash | set nonumber | set norelativenumber | resize 10<CR>i")
 map.set("t", "<C-q>", "<C-\\><C-n>")
+map.set("t", "<C-A-q>", "<cmd>:q<CR>")
 
 ---------------
 ---- netrw ----

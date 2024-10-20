@@ -33,7 +33,7 @@ opt.shiftwidth = 4
 opt.expandtab = true
 opt.autoindent = true
 --禁用鼠标
-opt.mouse = ""
+opt.mouse = "a"
 --status状态栏
 opt.laststatus = 2
 opt.statusline = "#%n %t %M"
@@ -90,6 +90,9 @@ end, { expr = true })
 map.set("i", "<S-Tab>", function()
     return vim.fn.pumvisible() == 1 and "<Up>" or "<S-Tab>"
 end, { expr = true })
+--terminal
+map.set("n", "<C-`>", "<cmd>split term://bash | set nonumber | set norelativenumber | resize 10<CR>")
+map.set("t", "<C-q>", "<C-\\><C-n>")
 
 ---------------
 ---- netrw ----
@@ -137,20 +140,39 @@ api.nvim_create_autocmd("LspAttach", {
     desc = "lsp attach",
     group = lspGroup,
     callback = function(args)
+        -- 打印参数 使用nvim -V命令打印到日志文件
+        -- print(string.format('event fired: %s', vim.inspect(args)))
+        -- 打印文件类型
+        -- print(vim.bo.filetype)
         local bufnr = args.buf
-        local client = lsp.get_client_by_id(args.data.client_id)
+        local client_id = args.data.client_id
+        local client = lsp.get_client_by_id(client_id)
+        -- completefunc
         if client.server_capabilities.completionProvider then
             vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
         end
         if client.server_capabilities.definitionProvider then
             vim.bo[bufnr].tagfunc = "v:lua.vim.lsp.tagfunc"
         end
-        map.set({ "n", "v" }, "<C-A-l>", lsp.buf.format)
-        map.set("i", "<C-A-l>", function()
-            api.nvim_input("<Esc>")
-            lsp.buf.format()
-        end)
-        -- 禁用注释行换行自动注释
+        -- autoformat on save
+        -- async = false. This ensures that the formatting request will block until it completes, so that it completely finishes formatting before flushing the file to disk.
+        api.nvim_create_autocmd("BufWritePre", {
+            desc = "lsp autoformat on buffer save",
+            group = lspGroup,
+            buffer = bufnr,
+            callback = function()
+                lsp.buf.format({ async = false, id = client_id })
+            end,
+        })
+        -- keymaps
+        map.set({ "n", "v" }, "<C-A-l>", lsp.buf.format, { buffer = bufnr, desc = "Lsp Format" })
+        map.set({ "i", "n" }, "<C-.>", lsp.buf.code_action, { buffer = bufnr, desc = "Code Action" })
+        map.set("n", "gr", vim.lsp.buf.rename, { buffer = bufnr, desc = "Rename Symbol" })
+        map.set("n", "gD", lsp.buf.declaration, { buffer = bufnr, desc = "Go to Declaration" })
+        map.set("n", "gd", lsp.buf.definition, { buffer = bufnr, desc = "Go to Definition" })
+        map.set("n", "gi", lsp.buf.implementation, { buffer = bufnr, desc = "Go to Implementation" })
+        map.set("n", "gl", vim.diagnostic.open_float, { buffer = bufnr, desc = "Open Diagnostic Float" })
+        -- behiver
         opt.formatoptions:remove({ "c", "r", "o" })
     end,
 })
@@ -159,11 +181,12 @@ api.nvim_create_autocmd("FileType", {
     group = lspGroup,
     pattern = "lua",
     callback = function()
-        local client = lsp.get_clients({ name = "lua-ls" })[1]
+        local lsp_client_name = "lua-ls"
+        local client = lsp.get_clients({ name = lsp_client_name })[1]
         local client_id
         if client == nil then
             client_id = lsp.start({
-                name = "lua-ls",
+                name = lsp_client_name,
                 cmd = { "lua-language-server" },
                 settings = { Lua = { diagnostics = { globals = { "vim" } } } },
             })
@@ -178,17 +201,16 @@ api.nvim_create_autocmd("FileType", {
     group = lspGroup,
     pattern = "rust",
     callback = function()
-        local client = lsp.get_clients({ name = "rust-ls" })[1]
+        local lsp_client_name = "rust-ls"
+        local client = lsp.get_clients({ name = lsp_client_name })[1]
         local client_id
         if client == nil then
             client_id = lsp.start({
-                name = "rust-ls",
+                name = lsp_client_name,
                 cmd = { "rustup", "run", "stable", "rust-analyzer" },
                 settings = {
                     ["rust-analyzer"] = {
-                        diagnostics = {
-                            enable = false,
-                        },
+                        -- search rust-analyer comfiguration
                     }
                 }
             })

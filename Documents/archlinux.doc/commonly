@@ -118,6 +118,7 @@ g_                                      # like $ but without the newline charact
 0                                       # some as ^
 .                                       # repait last operation group
 q{0-9a-zA-Z"}                           # record macro to register, see :h q
+K                                       # lookup coursor word, see :h K
 #-------netrw--------
 shift + d                               # 删除文件/文件夹
 shift + r                               # 重命名
